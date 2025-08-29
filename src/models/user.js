@@ -31,17 +31,30 @@ const userSchema = new Schema({
         enum: ['user', 'admin'],
         default: 'user',      
     },
-    problemSolved: {
-        type: [String],
-    },
-    password:{
-        type:String,
-        required:true,
+    problemSolved: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'Problem',  
+        }
+    ],
+    password: {
+        type: String,
+        required: true,
     }
 }, { timestamps: true });       
 
-const user = mongoose.model("user", userSchema);
 
-module.exports = user;
+userSchema.post('findOneAndDelete', async function(doc){
+    if(doc){
+        await mongoose.model('submission').deleteMany({
+            userId: userInfo._id
+        })
+    }
+})
+
+const User = mongoose.models.User || mongoose.model("User", userSchema);
+
+module.exports = User;
+
 
 
