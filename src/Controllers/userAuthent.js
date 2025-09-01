@@ -22,9 +22,16 @@ const register = async (req, res) => {
             process.env.JWT_SECRET,
             { expiresIn: 60 * 60 }
         );
-
+const reply={
+    firstName:user.firstName,
+    emailId:user.emailId,
+    _id:user._id
+}
         res.cookie('token', token, { maxAge: 60 * 60 * 1000, httpOnly: true });
-        res.status(201).send("User Registered Successfully");
+        res.status(201).json({
+            user:reply,
+            message:"User Registered Successfully"
+        });
     } catch (error) {
         res.status(400).send("Error: " + error.message); 
     }
@@ -53,9 +60,16 @@ const login = async (req, res) => {
             process.env.JWT_SECRET,
             { expiresIn: 60 * 60 }
         );
-
+const reply={
+    firstName:user.firstName,
+    emailId:user.emailId,
+    _id:user._id
+}
         res.cookie('token', token, { maxAge: 60 * 60 * 1000, httpOnly: true });
-        res.status(200).send("User Logged In Successfully");
+        res.status(200).json({
+            user:reply,
+            message:"User Logged In Successfully"
+        });
     } catch (error) {
         res.status(401).send("Error: " + error.message); 
     }
