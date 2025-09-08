@@ -1,12 +1,14 @@
-// contexts/AuthContext.js
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 
 const AuthContext = createContext();
 
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
+export const useAuth = () => useContext(AuthContext);
+
+const api = axios.create({
+  baseURL: 'http://localhost:3000', 
+  withCredentials: true,            
+});
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -18,9 +20,9 @@ export const AuthProvider = ({ children }) => {
 
   const checkAuthStatus = async () => {
     try {
-      const response = await axios.get('/user/check', { withCredentials: true });
+      const response = await api.get('/user/check');
       setUser(response.data.user);
-    } catch (error) {
+    } catch {
       setUser(null);
     } finally {
       setLoading(false);
@@ -29,7 +31,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post('/user/login', { emailId: email, password }, { withCredentials: true });
+      const response = await api.post('/user/login', { emailId: email, password });
       setUser(response.data.user);
       return { success: true };
     } catch (error) {
@@ -39,7 +41,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      const response = await axios.post('/user/register', userData, { withCredentials: true });
+      const response = await api.post('/user/register', userData);
       setUser(response.data.user);
       return { success: true };
     } catch (error) {
@@ -49,7 +51,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await axios.post('/user/logout', {}, { withCredentials: true });
+      await api.post('/user/logout');
       setUser(null);
       return { success: true };
     } catch (error) {
@@ -57,16 +59,8 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const value = {
-    user,
-    login,
-    register,
-    logout,
-    checkAuthStatus
-  };
-
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ user, login, register, logout, checkAuthStatus }}>
       {!loading && children}
     </AuthContext.Provider>
   );
